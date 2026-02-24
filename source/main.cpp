@@ -51,17 +51,24 @@ int main()
     // Set Clear Color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-    float triangle_vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f,
+    float square_vertices[] = {
+        0.5f,  0.5f, 0.0f,  // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
     };
 
-    // Make the buffer
+    // specify how to draw the triangles for the square
+    unsigned indices[] = {
+        0,1,3,
+        1,2,3
+    };
+
+    // Make and bind the vertex buffer
     unsigned vertex_buffer_object;
     glGenBuffers(1, &vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(square_vertices), square_vertices, GL_STATIC_DRAW);
 
     // Tell the vertex shader how to interpret the buffer
     unsigned vertex_array_object;
@@ -69,6 +76,12 @@ int main()
     glBindVertexArray(vertex_array_object);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // Make and bind the element buffer
+    unsigned element_buffer_object;
+    glGenBuffers(1, &element_buffer_object);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Variables for checking compilation of shaders    
     int success;
@@ -133,7 +146,7 @@ int main()
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
