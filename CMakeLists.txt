@@ -8,6 +8,10 @@ target_include_directories(glad PUBLIC "external/glad/include")
 # GLFW
 add_subdirectory(external/glfw)
 
+# stb_image
+add_library(stb_image INTERFACE)
+target_include_directories(stb_image INTERFACE "external/stb_image")
+
 # Source files
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -19,6 +23,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     glad
     OpenGL::GL
+    stb_image
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
