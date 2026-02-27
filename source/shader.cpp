@@ -40,26 +40,64 @@ Shader::Shader(const char* vertex_file_path, const char* fragment_file_path)
     const char* vertex_shader_code = vertex_code.c_str();
     const char* fragment_shader_code = fragment_code.c_str();
 
+    int success;
+    char info_log[512];
+
+    unsigned vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vertex_shader_code, NULL);
+    glCompileShader(vertex);
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, info_log);
+        ErrorPrinter::PrintError(info_log);
+    }
+
+    unsigned fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fragment_shader_code, NULL);
+    glCompileShader(fragment);
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragment, 512, NULL, info_log);
+        ErrorPrinter::PrintError(info_log);
+    }
     
-    
+    id = glCreateProgram();
+    glAttachShader(id, vertex);
+    glAttachShader(id, fragment);
+    glLinkProgram(id);
+
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog(id, 512, NULL, info_log);
+        ErrorPrinter::PrintError(info_log);
+    }
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
 }
 
 void Shader::Use()
 {
-
+    glUseProgram(id);
 }
 
 void Shader::SetBool(const std::string& name, bool value) const
 {
-
+    GLint uniform_location = glGetUniformLocation(id, name.c_str());
+    glUniform1i(uniform_location, (int)value);
 }
 
 void Shader::SetInt(const std::string& name, int value) const
 {
-
+    GLint uniform_location = glGetUniformLocation(id, name.c_str());
+    glUniform1i(uniform_location, value);
 }
 
 void Shader::SetFloat(const std::string& name, float value) const
 {
-
+    GLint uniform_location = glGetUniformLocation(id, name.c_str());
+    glUniform1f(uniform_location, value);
 }

@@ -2,7 +2,9 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
 #include "error_printer.h"
+#include "shader.h"
 
 void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
@@ -52,10 +54,10 @@ int main()
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
     float square_vertices[] = {
-        0.5f,  0.5f, 0.0f,  // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+        0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  // top right
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // top left 
     };
 
     // specify how to draw the triangles for the square
@@ -74,8 +76,14 @@ int main()
     unsigned vertex_array_object;
     glGenVertexArrays(1, &vertex_array_object);
     glBindVertexArray(vertex_array_object);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Make and bind the element buffer
     unsigned element_buffer_object;
@@ -83,61 +91,9 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // Variables for checking compilation of shaders    
-    int success;
-    char info_log[512];
+    Shader square_shader("./shaders/vertex/square.vs", "./shaders/fragment/square.fs");
+    square_shader.Use();
     
-    // Vertex Shader
-    const char* vertex_shader_source = "#version 330 core\n"
-        "layout (location = 0) in vec3 vertex_position;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(vertex_position, 1.0);\n"
-        "}\0";
-    unsigned vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
-    glCompileShader(vertex_shader);
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-        ErrorPrinter::PrintError(info_log);
-    }
-        
-    // Fragment Shader
-    const char* fragment_shader_source = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\n\0";
-    unsigned fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
-    glCompileShader(fragment_shader);
-    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-        ErrorPrinter::PrintError(info_log);
-    }
-
-    // Shader program
-    unsigned shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        glGetProgramInfoLog(shader_program, 512, NULL, info_log);
-        ErrorPrinter::PrintError(info_log);
-    }
-    glUseProgram(shader_program);
-
-    // Delete shaders after linking
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
     // Game loop
     while(!glfwWindowShouldClose(window))
     {
