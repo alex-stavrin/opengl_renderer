@@ -111,6 +111,7 @@ int main()
     {
         unsigned texture;
         glGenTextures(1, &texture);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
     
         // texture wrapping
@@ -135,9 +136,32 @@ int main()
     }
     stbi_image_free(data);
 
+    data = stbi_load("./assets/awesomeface.png", &width, &height, &number_of_color_channels, 0);
+    if(data)
+    {
+        unsigned texture;
+        glGenTextures(1, &texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        
+        // pass image to texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    
+        // generate mip maps
+        glGenerateMipmap(GL_TEXTURE_2D);   
+    }
+    else
+    {
+        ErrorPrinter::PrintError("Failed to load image");
+    }
+    stbi_image_free(data);
+
 
     Shader square_shader("./shaders/vertex/square.vs", "./shaders/fragment/square.fs");
     square_shader.Use();
+
+    square_shader.SetInt("texture0", 0);
+    square_shader.SetInt("texture1", 1);
     
     // Game loop
     while(!glfwWindowShouldClose(window))
