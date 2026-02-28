@@ -10,8 +10,19 @@
 #include "error_printer.h"
 #include "shader.h"
 
+const unsigned starting_width = 800;
+const unsigned starting_height = 800;
+
+Shader* square_shader_ptr = nullptr;
+
 void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
+    if(square_shader_ptr)
+    {
+        glm::mat4 projection_matrix = glm::perspective(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
+        square_shader_ptr->SetMatrix("projection_matrix", projection_matrix);
+    }
+    
     glViewport(0, 0, new_width, new_height);
 }
 
@@ -33,7 +44,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Make window and assign to it our context
-    GLFWwindow* window = glfwCreateWindow(800, 600, "opengl_renderer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(starting_width, starting_height, "opengl_renderer", NULL, NULL);
     if(window == nullptr)
     {
         ErrorPrinter::PrintError("Failed to create GLFW window.");
@@ -57,51 +68,84 @@ int main()
     // Set Clear Color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-    float square_vertices[] = 
+    float cube_vertices[] = 
     {
-        0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 1.0f,  // top right
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f,   0.0f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   0.0f, 1.0f   // top left 
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     // specify how to draw the triangles for the square
-    unsigned indices[] = 
-    {
-        0,1,3,
-        1,2,3
-    };
+    // unsigned indices[] = 
+    // {
+    //     0,1,3,
+    //     1,2,3
+    // };
 
     // Make and bind the vertex buffer
     unsigned vertex_buffer_object;
     glGenBuffers(1, &vertex_buffer_object);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(square_vertices), square_vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 
     // Tell the vertex shader how to interpret the buffer
     unsigned vertex_array_object;
     glGenVertexArrays(1, &vertex_array_object);
     glBindVertexArray(vertex_array_object);
 
-    GLsizei stride = 8 * sizeof(float);
+    GLsizei stride = 5 * sizeof(float);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    // texture coordinate attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // texture coordinate attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
     // Make and bind the element buffer
-    unsigned element_buffer_object;
-    glGenBuffers(1, &element_buffer_object);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // unsigned element_buffer_object;
+    // glGenBuffers(1, &element_buffer_object);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     stbi_set_flip_vertically_on_load(true);  
 
@@ -169,17 +213,29 @@ int main()
     }
     stbi_image_free(data);
 
-
     Shader square_shader("./shaders/vertex/square.vs", "./shaders/fragment/square.fs");
+    square_shader_ptr = &square_shader;
     square_shader.Use();
 
     square_shader.SetInt("texture0", 0);
     square_shader.SetInt("texture1", 1);
 
-    glm::mat4 transformation = glm::mat4(1.0f);
-    transformation = glm::rotate(transformation, glm::radians(90.0f), glm::vec3(0.0,0.0,1.0));
+    // model matrix
+    glm::mat4 model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::rotate(model_matrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    square_shader.SetMatrix("transform", transformation);
+    // view matrix
+    glm::mat4 view_matrix = glm::mat4(1.0f);
+    view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    // projection matrix
+    glm::mat4 projection_matrix = glm::perspective(glm::radians(90.0f), (float)starting_width / (float)starting_height, 0.1f, 100.0f);
+    
+    square_shader.SetMatrix("model_matrix", model_matrix);
+    square_shader.SetMatrix("view_matrix", view_matrix);
+    square_shader.SetMatrix("projection_matrix", projection_matrix);
+
+    glEnable(GL_DEPTH_TEST);
     
     // Game loop
     while(!glfwWindowShouldClose(window))
@@ -188,8 +244,8 @@ int main()
         process_input(window);
 
         // Render
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
