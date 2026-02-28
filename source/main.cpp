@@ -7,6 +7,10 @@
 #include "shader.h"
 #include "stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
     glViewport(0, 0, new_width, new_height);

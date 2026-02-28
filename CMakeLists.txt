@@ -16,6 +16,10 @@ target_include_directories(stb_image INTERFACE "external/stb_image")
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# GLM
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE "external/glm")
+
 set(OpenGL_GL_PREFERENCE GLVND) # used to supress warning. No idea what this does
 find_package(OpenGL REQUIRED)
 
@@ -24,6 +28,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glad
     OpenGL::GL
     stb_image
+    glm
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
