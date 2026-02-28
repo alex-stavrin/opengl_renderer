@@ -7,9 +7,11 @@ layout (location = 2) in vec2 input_texture_coordinates;
 out vec3 vertex_color;
 out vec2 texture_coordinates;
 
+uniform mat4 transform;
+
 void main()
 {
-    gl_Position = vec4(input_position, 1.0);
+    gl_Position = transform * vec4(input_position, 1.0);
     vertex_color = input_color;
     texture_coordinates = input_texture_coordinates;
 }

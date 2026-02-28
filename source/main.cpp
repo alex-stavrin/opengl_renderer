@@ -2,14 +2,13 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-
-#include "error_printer.h"
-#include "shader.h"
-#include "stb_image.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "stb_image.h"
+
+#include "error_printer.h"
+#include "shader.h"
 
 void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
@@ -176,6 +175,11 @@ int main()
 
     square_shader.SetInt("texture0", 0);
     square_shader.SetInt("texture1", 1);
+
+    glm::mat4 transformation = glm::mat4(1.0f);
+    transformation = glm::rotate(transformation, glm::radians(90.0f), glm::vec3(0.0,0.0,1.0));
+
+    square_shader.SetMatrix("transform", transformation);
     
     // Game loop
     while(!glfwWindowShouldClose(window))
