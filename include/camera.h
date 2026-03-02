@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "GLFW/glfw3.h"
 
 class Camera
 {
@@ -20,8 +21,11 @@ class Camera
 
         void UpdateCameraVectors();
 
+        GLFWwindow* window;
+
     public:
 
-        Camera(const glm::vec3& n_position, float n_movement_speed, float n_mouse_sensitivity);
+        Camera(GLFWwindow* n_window, const glm::vec3& n_position, float n_movement_speed, float n_mouse_sensitivity);
         glm::mat4 GetViewMatrix();
+        void Tick(float delta_time);
 };

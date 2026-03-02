@@ -9,16 +9,12 @@
 
 #include "error_printer.h"
 #include "shader.h"
+#include "camera.h"
 
 const unsigned starting_width = 800;
 const unsigned starting_height = 600;
 
 Shader* square_shader_ptr = nullptr;
-
-glm::vec3 camera_position = glm::vec3(0,0,0);
-glm::vec3 camera_front = glm::vec3(0,0,1);
-glm::vec3 camera_up = glm::vec3(0,1,0);
-glm::vec3 camera_right = glm::normalize(glm::cross(camera_front, camera_up));
 
 float delta_time = 1;
 
@@ -26,7 +22,7 @@ void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
     if(square_shader_ptr)
     {
-        glm::mat4 projection_matrix = glm::perspective(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
+        glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
         square_shader_ptr->SetMatrix("projection_matrix", projection_matrix);
     }
     
@@ -38,24 +34,6 @@ void process_input(GLFWwindow* window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
-    }
-
-    const float camera_speed = 2.5 * delta_time;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        camera_position += camera_front * camera_speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        camera_position += -camera_front * camera_speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        camera_position += camera_right * camera_speed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        camera_position += -camera_right * camera_speed;
     }
 }
 
@@ -247,13 +225,10 @@ int main()
 
     // model matrix
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(0.0,0.0,2.0));
-
-    // view matrix
-
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0,0.5,2.0));
 
     // projection matrix
-    glm::mat4 projection_matrix = glm::perspective(glm::radians(90.0f), (float)starting_width / (float)starting_height, 0.1f, 100.0f);
+    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)starting_width / (float)starting_height, 0.1f, 100.0f);
     
     square_shader.SetMatrix("model_matrix", model_matrix);
     square_shader.SetMatrix("projection_matrix", projection_matrix);
@@ -261,6 +236,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
     
     float last_frame_time = 1;
+
+    Camera camera(window, glm::vec3(0.0f), 2.5, 2);
 
     // Game loop
     while(!glfwWindowShouldClose(window))
@@ -272,9 +249,11 @@ int main()
         // Input
         process_input(window);
 
+        // Tick
+        camera.Tick(delta_time);
+
         // Render
-        glm::mat4 view_matrix = glm::lookAt(camera_position, camera_position + camera_front, camera_up);
-        square_shader.SetMatrix("view_matrix", view_matrix);
+        square_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 36);
