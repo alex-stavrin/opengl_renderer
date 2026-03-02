@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 Camera::Camera(GLFWwindow* n_window, const glm::vec3& n_position, float n_movement_speed, float n_mouse_sensitivity) : 
     window(n_window), position(n_position), up(glm::vec3(0,1,0)), yaw(0), pitch(0), front(0,0,1),
@@ -33,23 +34,40 @@ void Camera::Tick(float delta_time)
     if (window == nullptr) return;
 
     // Movement
-    const float camera_speed = movement_speed * delta_time;
+    glm::vec3 movement_direction(0.0, 0.0, 0.0);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        position += front * camera_speed;
+        movement_direction += front;
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        position += -front * camera_speed;
+        movement_direction += -front;
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        position += right * camera_speed;
+        movement_direction += right;
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        position += -right * camera_speed;
-    } 
+        movement_direction += -right;
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        movement_direction += up;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        movement_direction += -up;
+    }
+
+    float movement_direction_length = glm::length(movement_direction);
+    if(movement_direction_length > 0.001)
+    {
+        const float camera_speed = movement_speed * delta_time;
+        movement_direction = glm::normalize(movement_direction);
+
+        position += movement_direction * camera_speed;
+    }
 }
 
 void Camera::OnMouseMoved(GLFWwindow* window, double x_pos_in, double y_pos_in)
