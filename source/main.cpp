@@ -1,30 +1,63 @@
 #include <iostream>
+#include <vector>
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "stb_image.h"
 
 #include "error_printer.h"
 #include "shader.h"
 #include "camera.h"
 
-Shader* square_shader_ptr = nullptr;
-Camera* camera_ptr = nullptr;
+// Window
+int base_window_width = 1280;
+int base_window_height = 720;
 
+int last_window_width = base_window_width;
+int last_window_height = base_window_height;
+int last_window_x = 200;
+int last_window_y = 200;
+
+bool is_fullscreen = true;
+
+
+Camera* camera_ptr = nullptr;
+std::vector<Shader*> shaders;
 float delta_time = 1;
 
 void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
 {
-    if(square_shader_ptr)
+    for(Shader* shader : shaders)
     {
-        glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
-        square_shader_ptr->SetMatrix("projection_matrix", projection_matrix);
+        if(shader)
+        {
+            glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
+            shader->SetMatrix("projection_matrix", projection_matrix);
+        }
     }
     
     glViewport(0, 0, new_width, new_height);
+}
+
+void toggle_fullscreen(GLFWwindow* window)
+{
+    if(is_fullscreen) // exit fullscreen (windowed)
+    {
+        glfwSetWindowMonitor(window, nullptr, last_window_x, last_window_y, last_window_width, last_window_height, 0);
+    }
+    else // fullscreen
+    {
+        glfwGetWindowPos(window, &last_window_x, &last_window_y);
+        glfwGetWindowSize(window, &last_window_width, &last_window_height);
+        
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    }
+    is_fullscreen = !is_fullscreen;
 }
 
 void process_input(GLFWwindow* window)
@@ -32,6 +65,21 @@ void process_input(GLFWwindow* window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
+    }
+
+    // We have this thing to avoid switching many times in a row
+    static bool f11_pressed = false;
+    if(glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS)
+    {
+        if(!f11_pressed)
+        {
+            toggle_fullscreen(window);
+            f11_pressed = true;
+        }
+    }
+    else
+    {
+        f11_pressed = false;
     }
 }
 
@@ -42,7 +90,6 @@ void on_mouse_moved(GLFWwindow* window, double x_pos_in, double y_pos_in)
         camera_ptr->OnMouseMoved(window, x_pos_in, y_pos_in);
     }
 }
-
 
 int main()
 {
@@ -88,7 +135,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, on_window_size_changed);
 
     // Set Clear Color
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     float cube_vertices[] = 
     {
@@ -235,28 +282,37 @@ int main()
     }
     stbi_image_free(data);
 
-    Shader square_shader("./shaders/vertex/square.vs", "./shaders/fragment/square.fs");
-    square_shader_ptr = &square_shader;
+    Shader square_shader("./shaders/vertex/crate.vs", "./shaders/fragment/crate.fs");
+    shaders.push_back(&square_shader);
     square_shader.Use();
 
     square_shader.SetInt("texture0", 0);
     square_shader.SetInt("texture1", 1);
 
     // model matrix
-    glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(0.0,0.5,2.0));
+    glm::mat4 crate_model_matrix = glm::mat4(1.0f);
+    crate_model_matrix = glm::translate(crate_model_matrix, glm::vec3(0.0,0.5,2.0));
 
     // projection matrix
     glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)primary_monitor_width / (float)primary_monitor_height, 0.1f, 100.0f);
     
-    square_shader.SetMatrix("model_matrix", model_matrix);
+    square_shader.SetMatrix("model_matrix", crate_model_matrix);
     square_shader.SetMatrix("projection_matrix", projection_matrix);
+
+    Shader light_shader("./shaders/vertex/light.vs", "./shaders/fragment/light.fs");
+    shaders.push_back(&light_shader);
+    light_shader.Use();
+
+    glm::mat4 light_model_matrix = glm::mat4(1.0f);
+    light_model_matrix = glm::translate(light_model_matrix, glm::vec3(2.0,1.0,4.0));
+    light_shader.SetMatrix("model_matrix", light_model_matrix);
+    light_shader.SetMatrix("projection_matrix", projection_matrix);
 
     glEnable(GL_DEPTH_TEST);
     
     float last_frame_time = 1;
 
-    Camera camera(window, glm::vec3(0.0f), 2, 0.05, true);
+    Camera camera(window, glm::vec3(0.0f), 3, 0.05, true);
     camera_ptr = &camera;
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, on_mouse_moved);
@@ -275,9 +331,14 @@ int main()
         camera.Tick(delta_time);
 
         // Render
-        square_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        square_shader.Use();
+        square_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        light_shader.Use();
+        light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
