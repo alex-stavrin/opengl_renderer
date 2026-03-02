@@ -27,9 +27,12 @@ class Camera
         float last_mouse_y;
         float last_mouse_x;
 
+        bool invert_y_axis = false;
+
     public:
 
-        Camera(GLFWwindow* n_window, const glm::vec3& n_position, float n_movement_speed, float n_mouse_sensitivity);
+        Camera(GLFWwindow* n_window, const glm::vec3& n_position,
+            float n_movement_speed, float n_mouse_sensitivity, bool n_invert_y_axis);
         glm::mat4 GetViewMatrix();
         void Tick(float delta_time);
         void OnMouseMoved(GLFWwindow* window, double x_pos_in, double y_pos_in);

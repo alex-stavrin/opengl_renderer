@@ -15,6 +15,7 @@ const unsigned starting_width = 800;
 const unsigned starting_height = 600;
 
 Shader* square_shader_ptr = nullptr;
+Camera* camera_ptr = nullptr;
 
 float delta_time = 1;
 
@@ -37,6 +38,15 @@ void process_input(GLFWwindow* window)
     }
 }
 
+void on_mouse_moved(GLFWwindow* window, double x_pos_in, double y_pos_in)
+{
+    if(camera_ptr)
+    {
+        camera_ptr->OnMouseMoved(window, x_pos_in, y_pos_in);
+    }
+}
+
+
 int main()
 {
     glfwInit();
@@ -46,8 +56,14 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Get primary monitor
+    GLFWmonitor* primary_monitor = glfwGetPrimaryMonitor();
+
+    // Get info of primary monitor
+    const GLFWvidmode* primary_monitor_video_mode = glfwGetVideoMode(primary_monitor);
+
     // Make window and assign to it our context
-    GLFWwindow* window = glfwCreateWindow(starting_width, starting_height, "opengl_renderer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(primary_monitor_video_mode->width, primary_monitor_video_mode->height, "opengl_renderer", primary_monitor, NULL);
     if(window == nullptr)
     {
         ErrorPrinter::PrintError("Failed to create GLFW window.");
@@ -55,6 +71,9 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
+
+    // VSync
+    glfwSwapInterval(1);
 
     // Init GLAD
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -237,7 +256,10 @@ int main()
     
     float last_frame_time = 1;
 
-    Camera camera(window, glm::vec3(0.0f), 2.5, 2);
+    Camera camera(window, glm::vec3(0.0f), 2, 0.05, true);
+    camera_ptr = &camera;
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, on_mouse_moved);
 
     // Game loop
     while(!glfwWindowShouldClose(window))
