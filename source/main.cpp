@@ -11,9 +11,6 @@
 #include "shader.h"
 #include "camera.h"
 
-const unsigned starting_width = 800;
-const unsigned starting_height = 600;
-
 Shader* square_shader_ptr = nullptr;
 Camera* camera_ptr = nullptr;
 
@@ -62,8 +59,11 @@ int main()
     // Get info of primary monitor
     const GLFWvidmode* primary_monitor_video_mode = glfwGetVideoMode(primary_monitor);
 
+    int primary_monitor_width = primary_monitor_video_mode->width;
+    int primary_monitor_height = primary_monitor_video_mode->height;
+
     // Make window and assign to it our context
-    GLFWwindow* window = glfwCreateWindow(primary_monitor_video_mode->width, primary_monitor_video_mode->height, "opengl_renderer", primary_monitor, NULL);
+    GLFWwindow* window = glfwCreateWindow(primary_monitor_width, primary_monitor_height, "opengl_renderer", primary_monitor, NULL);
     if(window == nullptr)
     {
         ErrorPrinter::PrintError("Failed to create GLFW window.");
@@ -82,7 +82,7 @@ int main()
     }
 
     // Set viewport properties
-    glViewport(0,0,starting_width,starting_height);
+    glViewport(0, 0, primary_monitor_width, primary_monitor_height);
 
     // On window size changed. Change also the viewport
     glfwSetFramebufferSizeCallback(window, on_window_size_changed);
@@ -247,7 +247,7 @@ int main()
     model_matrix = glm::translate(model_matrix, glm::vec3(0.0,0.5,2.0));
 
     // projection matrix
-    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)starting_width / (float)starting_height, 0.1f, 100.0f);
+    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)primary_monitor_width / (float)primary_monitor_height, 0.1f, 100.0f);
     
     square_shader.SetMatrix("model_matrix", model_matrix);
     square_shader.SetMatrix("projection_matrix", projection_matrix);
