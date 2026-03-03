@@ -137,49 +137,49 @@ int main()
     // Set Clear Color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    float cube_vertices[] = 
-    {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    float cube_vertices[] = {
+        // Positions          // Normals           // UVs
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+        0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+        0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+        0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
     // specify how to draw the triangles for the square
@@ -200,15 +200,19 @@ int main()
     glGenVertexArrays(1, &vertex_array_object);
     glBindVertexArray(vertex_array_object);
 
-    GLsizei stride = 5 * sizeof(float);
+    GLsizei stride = 8 * sizeof(float);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    // normal attribute 
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // uv attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // Make and bind the element buffer
     // unsigned element_buffer_object;
@@ -281,41 +285,47 @@ int main()
         ErrorPrinter::PrintError("Failed to load image");
     }
     stbi_image_free(data);
-
-    Shader square_shader("./shaders/vertex/crate.vs", "./shaders/fragment/crate.fs");
-    shaders.push_back(&square_shader);
-    square_shader.Use();
-
-    square_shader.SetInt("texture0", 0);
-    square_shader.SetInt("texture1", 1);
-
-    // model matrix
-    glm::mat4 crate_model_matrix = glm::mat4(1.0f);
-    crate_model_matrix = glm::translate(crate_model_matrix, glm::vec3(0.0,0.5,2.0));
-
-    // projection matrix
-    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)primary_monitor_width / (float)primary_monitor_height, 0.1f, 100.0f);
     
-    square_shader.SetMatrix("model_matrix", crate_model_matrix);
-    square_shader.SetMatrix("projection_matrix", projection_matrix);
-
-    Shader light_shader("./shaders/vertex/light.vs", "./shaders/fragment/light.fs");
-    shaders.push_back(&light_shader);
-    light_shader.Use();
-
-    glm::mat4 light_model_matrix = glm::mat4(1.0f);
-    light_model_matrix = glm::translate(light_model_matrix, glm::vec3(2.0,1.0,4.0));
-    light_shader.SetMatrix("model_matrix", light_model_matrix);
-    light_shader.SetMatrix("projection_matrix", projection_matrix);
-
-    glEnable(GL_DEPTH_TEST);
-    
-    float last_frame_time = 1;
-
     Camera camera(window, glm::vec3(0.0f), 3, 0.05, true);
     camera_ptr = &camera;
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, on_mouse_moved);
+
+    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)primary_monitor_width / (float)primary_monitor_height, 0.1f, 100.0f);
+
+    glm::vec3 light_color = glm::vec3(1.0f,1.0f,1.0f);
+    Shader light_shader("./shaders/light/light.vs", "./shaders/light/light.fs");
+    shaders.push_back(&light_shader);
+    light_shader.Use();
+
+    glm::vec3 light_position = glm::vec3(2.0,2.0,4.0);
+    glm::mat4 light_model_matrix = glm::mat4(1.0f);
+    light_model_matrix = glm::translate(light_model_matrix, light_position);
+    light_shader.SetMatrix("model_matrix", light_model_matrix);
+    light_shader.SetMatrix("projection_matrix", projection_matrix);
+
+    light_shader.SetVector3("light_color", light_color);
+
+    Shader crate_shader("./shaders/crate/crate.vs", "./shaders/crate/crate.fs");
+    shaders.push_back(&crate_shader);
+    crate_shader.Use();
+
+    crate_shader.SetVector3("light_color", light_color);
+    crate_shader.SetVector3("light_position", light_position);
+
+    crate_shader.SetInt("texture0", 0);
+    crate_shader.SetInt("texture1", 1);
+
+    // model matrix
+    glm::mat4 crate_model_matrix = glm::mat4(1.0f);
+    crate_model_matrix = glm::translate(crate_model_matrix, glm::vec3(0.0,0.5,2.0));
+    
+    crate_shader.SetMatrix("model_matrix", crate_model_matrix);
+    crate_shader.SetMatrix("projection_matrix", projection_matrix);
+
+    glEnable(GL_DEPTH_TEST);
+    
+    float last_frame_time = 1;
 
     // Game loop
     while(!glfwWindowShouldClose(window))
@@ -333,8 +343,9 @@ int main()
         // Render
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        square_shader.Use();
-        square_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+        crate_shader.Use();
+        crate_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+        crate_shader.SetVector3("camera_position", camera.GetPosition());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         light_shader.Use();

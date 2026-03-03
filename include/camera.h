@@ -36,4 +36,5 @@ class Camera
         glm::mat4 GetViewMatrix();
         void Tick(float delta_time);
         void OnMouseMoved(GLFWwindow* window, double x_pos_in, double y_pos_in);
+        glm::vec3 GetPosition() const {return position;};
 };
