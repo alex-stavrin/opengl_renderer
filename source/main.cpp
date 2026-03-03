@@ -23,7 +23,6 @@ int last_window_y = 200;
 
 bool is_fullscreen = true;
 
-
 Camera* camera_ptr = nullptr;
 std::vector<Shader*> shaders;
 float delta_time = 1;
@@ -310,12 +309,14 @@ int main()
     shaders.push_back(&crate_shader);
     crate_shader.Use();
 
-    crate_shader.SetVector3("light_color", light_color);
-    crate_shader.SetVector3("light_position", light_position);
+    crate_shader.SetVector3("light.position", light_position);
+    crate_shader.SetVector3("light.ambient", glm::vec3(0.2f));
+    crate_shader.SetVector3("light.diffuse", glm::vec3(0.5f));
+    crate_shader.SetVector3("light.specular", glm::vec3(1.0f));
    
-    crate_shader.SetVector3("material.ambient", glm::vec3(0.35f));
-    crate_shader.SetVector3("material.diffuse", glm::vec3(0.5f));
-    crate_shader.SetVector3("material.specular", glm::vec3(0.5f));
+    crate_shader.SetVector3("material.ambient", glm::vec3(1.0f));
+    crate_shader.SetVector3("material.diffuse", glm::vec3(1.0f));
+    crate_shader.SetVector3("material.specular", glm::vec3(1.0f));
     crate_shader.SetFloat("material.shininess", 32.0f);
 
     crate_shader.SetInt("texture0", 0);
