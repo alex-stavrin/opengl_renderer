@@ -312,6 +312,11 @@ int main()
 
     crate_shader.SetVector3("light_color", light_color);
     crate_shader.SetVector3("light_position", light_position);
+   
+    crate_shader.SetVector3("material.ambient", glm::vec3(0.35f));
+    crate_shader.SetVector3("material.diffuse", glm::vec3(0.5f));
+    crate_shader.SetVector3("material.specular", glm::vec3(0.5f));
+    crate_shader.SetFloat("material.shininess", 32.0f);
 
     crate_shader.SetInt("texture0", 0);
     crate_shader.SetInt("texture1", 1);
