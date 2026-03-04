@@ -13,88 +13,11 @@
 #include "camera.h"
 #include "op_window.h"
 
-// Window
-int base_window_width = 1280;
-int base_window_height = 720;
-
-int last_window_width = base_window_width;
-int last_window_height = base_window_height;
-int last_window_x = 200;
-int last_window_y = 200;
-
-bool is_fullscreen = true;
-
-Camera* camera_ptr = nullptr;
-std::vector<Shader*> shaders;
 float delta_time = 1;
-
-void on_window_size_changed(GLFWwindow* window, int new_width, int new_height)
-{
-    for(Shader* shader : shaders)
-    {
-        if(shader)
-        {
-            glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)new_width / (float)new_height, 0.1f, 100.0f);
-            shader->SetMatrix("projection_matrix", projection_matrix);
-        }
-    }
-    
-    glViewport(0, 0, new_width, new_height);
-}
-
-void toggle_fullscreen(GLFWwindow* window)
-{
-    if(is_fullscreen) // exit fullscreen (windowed)
-    {
-        glfwSetWindowMonitor(window, nullptr, last_window_x, last_window_y, last_window_width, last_window_height, 0);
-    }
-    else // fullscreen
-    {
-        glfwGetWindowPos(window, &last_window_x, &last_window_y);
-        glfwGetWindowSize(window, &last_window_width, &last_window_height);
-        
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-    }
-    is_fullscreen = !is_fullscreen;
-}
-
-void process_input(GLFWwindow* window)
-{
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-
-    // We have this thing to avoid switching many times in a row
-    static bool f11_pressed = false;
-    if(glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS)
-    {
-        if(!f11_pressed)
-        {
-            toggle_fullscreen(window);
-            f11_pressed = true;
-        }
-    }
-    else
-    {
-        f11_pressed = false;
-    }
-}
-
-void on_mouse_moved(GLFWwindow* window, double x_pos_in, double y_pos_in)
-{
-    if(camera_ptr)
-    {
-        camera_ptr->OnMouseMoved(window, x_pos_in, y_pos_in);
-    }
-}
 
 int main()
 {
-
-    OpWindow op_window(glm::vec3(0.0f));
+    OpWindow::Init(glm::vec3(0.0f));
 
     float cube_vertices[] = {
         // Positions          // Normals           // UVs
@@ -141,13 +64,6 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
-    // specify how to draw the triangles for the square
-    // unsigned indices[] = 
-    // {
-    //     0,1,3,
-    //     1,2,3
-    // };
-
     // Make and bind the vertex buffer
     unsigned vertex_buffer_object;
     glGenBuffers(1, &vertex_buffer_object);
@@ -173,14 +89,7 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // Make and bind the element buffer
-    // unsigned element_buffer_object;
-    // glGenBuffers(1, &element_buffer_object);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
     stbi_set_flip_vertically_on_load(true);  
-
     // Load image
     int width;
     int height;
@@ -245,15 +154,15 @@ int main()
     }
     stbi_image_free(data);
     
-    Camera camera(op_window.GetWindowGLFW(), glm::vec3(0.0f), 3, 0.05, true);
-    camera_ptr = &camera;
+    Camera camera(OpWindow::GetWindowGLFW(), glm::vec3(0.0f), 3, 0.05, true);
+    OpWindow::SetCamera(&camera);
 
-
-    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)primary_monitor_width / (float)primary_monitor_height, 0.1f, 100.0f);
+    auto [window_width, window_height] = OpWindow::GetFrameBufferDimensions();
+    glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)window_width / (float)window_height, 0.1f, 100.0f);
 
     glm::vec3 light_color = glm::vec3(1.0f,1.0f,1.0f);
     Shader light_shader("./shaders/light/light.vs", "./shaders/light/light.fs");
-    shaders.push_back(&light_shader);
+    OpWindow::RegisterShader(&light_shader);
     light_shader.Use();
 
     glm::vec3 light_position = glm::vec3(2.0,2.0,4.0);
@@ -265,7 +174,7 @@ int main()
     light_shader.SetVector3("light_color", light_color);
 
     Shader crate_shader("./shaders/crate/crate.vs", "./shaders/crate/crate.fs");
-    shaders.push_back(&crate_shader);
+    OpWindow::RegisterShader(&crate_shader);
     crate_shader.Use();
 
     crate_shader.SetVector3("light.position", light_position);
@@ -293,14 +202,14 @@ int main()
     float last_frame_time = 1;
 
     // Game loop
-    while(!glfwWindowShouldClose(window))
+    while(!glfwWindowShouldClose(OpWindow::GetWindowGLFW()))
     {
         float current_time = static_cast<float>(glfwGetTime());
         delta_time = current_time - last_frame_time;
         last_frame_time = current_time;
 
         // Input
-        process_input(window);
+        OpWindow::Tick();
 
         // Tick
         camera.Tick(delta_time);
@@ -317,8 +226,7 @@ int main()
         light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        OpWindow::EndFrame();
     }
 
     glfwTerminate();
