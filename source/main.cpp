@@ -177,7 +177,7 @@ int main()
     OpWindow::RegisterShader(&texture_shaded);
     texture_shaded.Use();
 
-    texture_shaded.SetVector3("light.position", light_position);
+    texture_shaded.SetVector3("light.direction", glm::vec3(-0.2f,-1.0f,-0.3f));
     texture_shaded.SetVector3("light.ambient", glm::vec3(0.2f));
     texture_shaded.SetVector3("light.diffuse", glm::vec3(0.8f));
     texture_shaded.SetVector3("light.specular", glm::vec3(1.0f));
@@ -218,9 +218,9 @@ int main()
         texture_shaded.SetVector3("camera_position", camera.GetPosition());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        light_shader.Use();
-        light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // light_shader.Use();
+        // light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
         OpWindow::EndFrame();
     }
