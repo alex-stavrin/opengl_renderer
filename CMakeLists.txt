@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(opengl_renderer)
 
+# Set C++ Version
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # GLAD
 add_library(glad STATIC "external/glad/src/glad.c")
 target_include_directories(glad PUBLIC "external/glad/include")
