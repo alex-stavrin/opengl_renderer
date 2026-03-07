@@ -24,6 +24,14 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 add_library(glm INTERFACE)
 target_include_directories(glm INTERFACE "external/glm")
 
+# ImGUI
+file(GLOB IMGUI_SOURCES 
+    "external/imgui/*.cpp"
+)
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC "external/imgui")
+target_link_libraries(imgui PRIVATE glfw glad)
+
 set(OpenGL_GL_PREFERENCE GLVND) # used to supress warning. No idea what this does
 find_package(OpenGL REQUIRED)
 
@@ -33,6 +41,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenGL::GL
     stb_image
     glm
+    imgui
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)

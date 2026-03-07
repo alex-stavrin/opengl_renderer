@@ -13,6 +13,10 @@
 #include "camera.h"
 #include "op_window.h"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 float delta_time = 1;
 
 int main()
@@ -197,6 +201,12 @@ int main()
     
     float last_frame_time = static_cast<float>(glfwGetTime());
 
+    // IMGUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(OpWindow::GetWindowGLFW(), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     // Game loop
     while(!glfwWindowShouldClose(OpWindow::GetWindowGLFW()))
     {
@@ -221,6 +231,18 @@ int main()
         // light_shader.Use();
         // light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
         // glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // IMGUI
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Debug");
+        ImGui::Text("Hello ImGUI");
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         OpWindow::EndFrame();
     }
