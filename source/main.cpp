@@ -12,10 +12,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "op_window.h"
-
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "ui.h"
 
 float delta_time = 1;
 
@@ -201,11 +198,7 @@ int main()
     
     float last_frame_time = static_cast<float>(glfwGetTime());
 
-    // IMGUI
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(OpWindow::GetWindowGLFW(), true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    UI::Init(OpWindow::GetWindowGLFW());
 
     // Game loop
     while(!glfwWindowShouldClose(OpWindow::GetWindowGLFW()))
@@ -228,21 +221,10 @@ int main()
         texture_shaded.SetVector3("camera_position", camera.GetPosition());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // light_shader.Use();
-        // light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // IMGUI
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Debug");
-        ImGui::Text("Hello ImGUI");
-        ImGui::End();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // UI
+        UI::BeginFrame();
+        UI::ConfigureDebugWindow();
+        UI::DrawFrame();
 
         OpWindow::EndFrame();
     }
