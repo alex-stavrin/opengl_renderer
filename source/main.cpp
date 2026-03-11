@@ -155,7 +155,7 @@ int main()
     }
     stbi_image_free(data);
     
-    Camera camera(OpWindow::GetWindowGLFW(), glm::vec3(0.0f), 3.0, 0.05, true);
+    Camera camera(OpWindow::GetWindowGLFW(), glm::vec3(0.0f), 3.0f, 0.05f, true);
     OpWindow::SetCamera(&camera);
 
     auto [window_width, window_height] = OpWindow::GetFrameBufferDimensions();
