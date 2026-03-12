@@ -178,10 +178,13 @@ int main()
     OpWindow::RegisterShader(&texture_shaded);
     texture_shaded.Use();
 
-    texture_shaded.SetVector3("light.direction", glm::vec3(-0.2f,-1.0f,-0.3f));
+    texture_shaded.SetVector3("light.position", light_position);
     texture_shaded.SetVector3("light.ambient", glm::vec3(0.2f));
     texture_shaded.SetVector3("light.diffuse", glm::vec3(0.8f));
     texture_shaded.SetVector3("light.specular", glm::vec3(1.0f));
+    texture_shaded.SetFloat("light.constant", 1.0f);
+    texture_shaded.SetFloat("light.linear", 0.09f);
+    texture_shaded.SetFloat("light.quadratic", 0.032f);
    
     texture_shaded.SetInt("material.diffuse", 0);
     texture_shaded.SetInt("material.specular", 1);
@@ -219,6 +222,11 @@ int main()
         texture_shaded.Use();
         texture_shaded.SetMatrix("view_matrix", camera.GetViewMatrix());
         texture_shaded.SetVector3("camera_position", camera.GetPosition());
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        light_shader.Use();
+        light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+        light_shader.SetVector3("camera_position", camera.GetPosition());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // UI
