@@ -10,6 +10,9 @@ struct Material
 struct Light
 {
     vec3 position;
+    vec3 direction;
+    float cutoff;
+    float outer_cutoff;
 
     vec3 ambient;
     vec3 diffuse;
@@ -40,11 +43,19 @@ void main()
     // ambient
     vec3 ambient = light.ambient * object_color;
 
-    // diffuse
     vec3 actual_normal = normalize(normal);
     vec3 light_direction = normalize(light.position - fragment_position);
+
+    vec3 specular = vec3(0.0f);
+    vec3 diffuse = vec3(0.0f);
+
+    float theta = dot(light_direction, normalize(-light.direction));
+    float epsilon = light.cutoff - light.outer_cutoff;
+    float spotlight_intensity = clamp((theta - light.outer_cutoff) / epsilon, 0.0, 1.0);
+
+    // diffuse 
     float diffuse_amount = max(dot(actual_normal, light_direction), 0.0);
-    vec3 diffuse = diffuse_amount * object_color * light.diffuse;
+    diffuse = diffuse_amount * object_color * light.diffuse;
 
     // specular
     vec3 camera_direction = normalize(camera_position - fragment_position);
@@ -52,15 +63,16 @@ void main()
     float specular_amount = pow(max(dot(camera_direction, reflection_direction),
         0.0), material.shininess);
     vec3 specular_texture = vec3(texture(material.specular, texture_coordinates));
-    vec3 specular =  (specular_amount * specular_texture) * light.specular;
+    specular =  (specular_amount * specular_texture) * light.specular;
+
 
     // point light attenuation
     float distance = length(light.position - fragment_position);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
     ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    diffuse *= attenuation * spotlight_intensity;
+    specular *= attenuation * spotlight_intensity;
 
     // final
     vec3 final_color = ambient + diffuse + specular;
