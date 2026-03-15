@@ -158,6 +158,12 @@ int main()
     Camera camera(OpWindow::GetWindowGLFW(), glm::vec3(0.0f), 3.0f, 0.05f, true);
     OpWindow::SetCamera(&camera);
 
+    glm::vec3 crate_position = glm::vec3(0.0,0.5,2.0);
+    glm::vec3 point_light_red_position = glm::vec3(-2.0,0.5, 4.0);
+    glm::vec3 point_light_blue_position = glm::vec3(2.0,0.5, 4.0);
+    glm::vec3 point_light_yellow_position = glm::vec3(-2.0,0.5, 0.0);
+    glm::vec3 point_light_green_position = glm::vec3(2.0,0.5, 0.0);
+
     auto [window_width, window_height] = OpWindow::GetFrameBufferDimensions();
     glm::mat4 projection_matrix = glm::perspectiveLH(glm::radians(90.0f), (float)window_width / (float)window_height, 0.1f, 100.0f);
 
@@ -178,15 +184,54 @@ int main()
     OpWindow::RegisterShader(&texture_shaded);
     texture_shaded.Use();
 
-    texture_shaded.SetVector3("light.ambient", glm::vec3(0.2f));
-    texture_shaded.SetVector3("light.diffuse", glm::vec3(0.8f));
-    texture_shaded.SetVector3("light.specular", glm::vec3(1.0f));
-    texture_shaded.SetFloat("light.cutoff", glm::cos(glm::radians(12.5f)));
-    texture_shaded.SetFloat("light.outer_cutoff", glm::cos(glm::radians(17.5f)));
-    texture_shaded.SetFloat("light.constant", 1.0f);
-    texture_shaded.SetFloat("light.linear", 0.09f);
-    texture_shaded.SetFloat("light.quadratic", 0.032f);
-    
+    // directional light
+    texture_shaded.SetVector3("directional_light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+    texture_shaded.SetVector3("directional_light.ambient", glm::vec3(0.05f));
+    texture_shaded.SetVector3("directional_light.diffuse", glm::vec3(0.4f));
+    texture_shaded.SetVector3("directional_light.specular", glm::vec3(0.5));
+
+    // point light 1
+    texture_shaded.SetVector3("point_lights[0].position", point_light_red_position);
+    texture_shaded.SetVector3("point_lights[0].ambient", glm::vec3(0.05f, 0.0f, 0.0f));
+    texture_shaded.SetVector3("point_lights[0].diffuse", glm::vec3(0.8f, 0.0f, 0.0f));
+    texture_shaded.SetVector3("point_lights[0].specular", glm::vec3(1.0f, 0.0f, 0.0f));
+    texture_shaded.SetFloat("point_lights[0].constant", 1.0f);
+    texture_shaded.SetFloat("point_lights[0].linear", 0.09f);
+    texture_shaded.SetFloat("point_lights[0].quadratic", 0.032f);
+    // point light 2
+    texture_shaded.SetVector3("point_lights[1].position", point_light_blue_position);
+    texture_shaded.SetVector3("point_lights[1].ambient", glm::vec3(0.0f, 0.0f, 0.05f));
+    texture_shaded.SetVector3("point_lights[1].diffuse", glm::vec3(0.0f, 0.0f, 0.8f));
+    texture_shaded.SetVector3("point_lights[1].specular", glm::vec3(0.0f, 0.0f, 1.0f));
+    texture_shaded.SetFloat("point_lights[1].constant", 1.0f);
+    texture_shaded.SetFloat("point_lights[1].linear", 0.09f);
+    texture_shaded.SetFloat("point_lights[1].quadratic", 0.032f);
+    // point light 3
+    texture_shaded.SetVector3("point_lights[2].position", point_light_yellow_position);
+    texture_shaded.SetVector3("point_lights[2].ambient", glm::vec3(0.05f, 0.05f, 0.0f));
+    texture_shaded.SetVector3("point_lights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.0f));
+    texture_shaded.SetVector3("point_lights[2].specular", glm::vec3(1.0f, 1.0f, 0.0f));
+    texture_shaded.SetFloat("point_lights[2].constant", 1.0f);
+    texture_shaded.SetFloat("point_lights[2].linear", 0.09f);
+    texture_shaded.SetFloat("point_lights[2].quadratic", 0.032f);
+    // point light 4
+    texture_shaded.SetVector3("point_lights[3].position", point_light_green_position);
+    texture_shaded.SetVector3("point_lights[3].ambient", glm::vec3(0.0f, 0.05f, 0.0f));
+    texture_shaded.SetVector3("point_lights[3].diffuse", glm::vec3(0.0f, 0.8f, 0.0f));
+    texture_shaded.SetVector3("point_lights[3].specular", glm::vec3(0.0f, 1.0f, 0.0f));
+    texture_shaded.SetFloat("point_lights[3].constant", 1.0f);
+    texture_shaded.SetFloat("point_lights[3].linear", 0.09f);
+    texture_shaded.SetFloat("point_lights[3].quadratic", 0.032f);
+
+    // spotlight
+    texture_shaded.SetVector3("spot_light.ambient", glm::vec3(0.0f));
+    texture_shaded.SetVector3("spot_light.diffuse", glm::vec3(0.0f));
+    texture_shaded.SetVector3("spot_light.specular", glm::vec3(0.0f));
+    texture_shaded.SetFloat("spot_light.constant", 1.0f);
+    texture_shaded.SetFloat("spot_light.linear", 0.09f);
+    texture_shaded.SetFloat("spot_light.quadratic", 0.032f);
+    texture_shaded.SetFloat("spot_light.cutoff", glm::cos(glm::radians(12.5f)));
+    texture_shaded.SetFloat("spot_light.outer_cutoff", glm::cos(glm::radians(15.0f)));
    
     texture_shaded.SetInt("material.diffuse", 0);
     texture_shaded.SetInt("material.specular", 1);
@@ -194,7 +239,7 @@ int main()
 
     // model matrix
     glm::mat4 crate_model_matrix = glm::mat4(1.0f);
-    crate_model_matrix = glm::translate(crate_model_matrix, glm::vec3(0.0,0.5,2.0));
+    crate_model_matrix = glm::translate(crate_model_matrix, crate_position);
     
     texture_shaded.SetMatrix("model_matrix", crate_model_matrix);
     texture_shaded.SetMatrix("projection_matrix", projection_matrix);
@@ -224,14 +269,41 @@ int main()
         texture_shaded.Use();
         texture_shaded.SetMatrix("view_matrix", camera.GetViewMatrix());
         texture_shaded.SetVector3("camera_position", camera.GetPosition());
-        texture_shaded.SetVector3("light.position", camera.GetPosition());
-        texture_shaded.SetVector3("light.direction",camera.GetFront());
+        texture_shaded.SetVector3("spot_light.position", camera.GetPosition());
+        texture_shaded.SetVector3("spot_light.direction", camera.GetFront());
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // light_shader.Use();
-        // light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
-        // light_shader.SetVector3("camera_position", camera.GetPosition());
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        // LIGHTS
+        light_shader.Use();
+        light_shader.SetMatrix("view_matrix", camera.GetViewMatrix());
+
+        // point light 1
+        light_shader.SetVector3("light_color", glm::vec3(255.0,0.0,0.0));
+        glm::mat4 light_model_matrix = glm::mat4(1.0f);
+        light_model_matrix = glm::translate(light_model_matrix, point_light_red_position);
+        texture_shaded.SetMatrix("model_matrix", light_model_matrix);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // point light 2
+        light_shader.SetVector3("light_color", glm::vec3(0.0,0.0,255.0));
+        light_model_matrix = glm::mat4(1.0f);
+        light_model_matrix = glm::translate(light_model_matrix, point_light_blue_position);
+        texture_shaded.SetMatrix("model_matrix", light_model_matrix);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // point light 3
+        light_shader.SetVector3("light_color", glm::vec3(255.0,255.0,0.0));
+        light_model_matrix = glm::mat4(1.0f);
+        light_model_matrix = glm::translate(light_model_matrix, point_light_yellow_position);
+        texture_shaded.SetMatrix("model_matrix", light_model_matrix);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // point light 4
+        light_shader.SetVector3("light_color", glm::vec3(0.0, 255.0,0.0));
+        light_model_matrix = glm::mat4(1.0f);
+        light_model_matrix = glm::translate(light_model_matrix, point_light_green_position);
+        texture_shaded.SetMatrix("model_matrix", light_model_matrix);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // UI
         UI::BeginFrame();
