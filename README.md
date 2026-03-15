@@ -1,5 +1,9 @@
 # OpenGL Renderer
 
+## Output
+
+![alt text](output.png)
+
 ## Compile and run
 
 ### Linux

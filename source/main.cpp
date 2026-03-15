@@ -15,12 +15,29 @@
 #include "ui.h"
 
 float delta_time = 1;
+Shader* texture_shaded_pointer = nullptr;
+bool flash_light_enabled = true;
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_F && action == GLFW_PRESS && texture_shaded_pointer)
+    {
+        flash_light_enabled = !flash_light_enabled;
+        
+        // Update shader values only when they change
+        float intensity = flash_light_enabled ? 1.0f : 0.0f;
+        texture_shaded_pointer->Use();
+        texture_shaded_pointer->SetVector3("spot_light.ambient", glm::vec3(intensity));
+        texture_shaded_pointer->SetVector3("spot_light.diffuse", glm::vec3(intensity));
+    }
+}
 
 int main()
 {
     OpWindow::Init(glm::vec3(0.0f));
 
-    float cube_vertices[] = {
+    float cube_vertices[] = 
+    {
         // Positions          // Normals           // UVs
         -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
@@ -181,6 +198,7 @@ int main()
     light_shader.SetVector3("light_color", light_color);
 
     Shader texture_shaded("./shaders/texture_shaded/texture_shaded.vs", "./shaders/texture_shaded/texture_shaded.fs");
+    texture_shaded_pointer = &texture_shaded;
     OpWindow::RegisterShader(&texture_shaded);
     texture_shaded.Use();
 
@@ -224,8 +242,7 @@ int main()
     texture_shaded.SetFloat("point_lights[3].quadratic", 0.032f);
 
     // spotlight
-    texture_shaded.SetVector3("spot_light.ambient", glm::vec3(0.0f));
-    texture_shaded.SetVector3("spot_light.diffuse", glm::vec3(0.0f));
+
     texture_shaded.SetVector3("spot_light.specular", glm::vec3(0.0f));
     texture_shaded.SetFloat("spot_light.constant", 1.0f);
     texture_shaded.SetFloat("spot_light.linear", 0.09f);
@@ -249,6 +266,12 @@ int main()
     float last_frame_time = static_cast<float>(glfwGetTime());
 
     UI::Init(OpWindow::GetWindowGLFW());
+
+    texture_shaded.Use();
+    texture_shaded.SetVector3("spot_light.ambient", glm::vec3(1.0f));
+    texture_shaded.SetVector3("spot_light.diffuse", glm::vec3(1.0f));
+
+    glfwSetKeyCallback(OpWindow::GetWindowGLFW(), key_callback);
 
     // Game loop
     while(!glfwWindowShouldClose(OpWindow::GetWindowGLFW()))
