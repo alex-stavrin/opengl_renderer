@@ -35,6 +35,16 @@ target_link_libraries(imgui PRIVATE glfw glad)
 set(OpenGL_GL_PREFERENCE GLVND) # used to supress warning. No idea what this does
 find_package(OpenGL REQUIRED)
 
+# Assimp
+# Disable heavy features to keep build fast
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE) # Use internal zlib to avoid system dependency
+
+add_subdirectory(external/assimp)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     glfw
     glad
@@ -42,6 +52,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     stb_image
     glm
     imgui
+    assimp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
