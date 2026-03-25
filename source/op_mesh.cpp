@@ -1,4 +1,5 @@
 #include "op_mesh.h"
+#include <cstddef>
 
 OpMesh::OpMesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
     const std::vector<Texture>& n_textures)
@@ -21,5 +22,22 @@ void OpMesh::SetupMesh()
     glGenBuffers(1, &vertex_buffer_object);
     glGenBuffers(1, &element_buffer_object);
 
-    /////
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+    glBindVertexArray(vertex_array_object);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned), &indices[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coordinates));
+
+    glBindVertexArray(0);
 }
