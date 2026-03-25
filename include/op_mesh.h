@@ -20,7 +20,7 @@ struct Texture
     std::string type;  
 };
 
-class Mesh
+class OpMesh
 {
     public:
     
@@ -28,7 +28,7 @@ class Mesh
         std::vector<unsigned> indices;
         std::vector<Texture> textures;
 
-        Mesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
+        OpMesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
             const std::vector<Texture>& n_textures);
 
         void Draw(const Shader& shader);

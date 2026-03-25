@@ -1,6 +1,6 @@
-#include "mesh.h"
+#include "op_mesh.h"
 
-Mesh::Mesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
+OpMesh::OpMesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
     const std::vector<Texture>& n_textures)
 {
     vertices = n_vertices;
@@ -10,12 +10,12 @@ Mesh::Mesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_
     SetupMesh();
 }
 
-void Mesh::Draw(const Shader& shader)
+void OpMesh::Draw(const Shader& shader)
 {
 
 }
 
-void Mesh::SetupMesh()
+void OpMesh::SetupMesh()
 {
     glGenVertexArrays(1, &vertex_array_object);
     glGenBuffers(1, &vertex_buffer_object);
