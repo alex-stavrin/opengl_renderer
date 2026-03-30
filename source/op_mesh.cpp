@@ -1,5 +1,7 @@
-#include "op_mesh.h"
 #include <cstddef>
+
+#include "error_printer.h"
+#include "op_mesh.h"
 
 OpMesh::OpMesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned> n_indices,
     const std::vector<Texture>& n_textures)
@@ -13,7 +15,40 @@ OpMesh::OpMesh(const std::vector<Vertex>& n_vertices, const std::vector<unsigned
 
 void OpMesh::Draw(const Shader& shader)
 {
+    unsigned diffuse_number = 1;
+    unsigned specular_number = 1;
+    unsigned normal_number = 1;
+    unsigned height_number = 1;
+    for (unsigned i = 0; i < textures.size(); i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        std::string texture_type = textures[i].type;
+        std::string number;
+        if (texture_type == "texture_diffuse")
+        {
+            number = std::to_string(diffuse_number);
+            diffuse_number++;
+        }
+        else if (texture_type == "texture_specular")
+        {
+            number = std::to_string(specular_number);
+            specular_number++;
+        }
+        else if (texture_type == "texture_normal")
+        {
 
+        }
+        else if (texture_type == "texture_height")
+        {
+
+        }
+        else
+        {
+            ErrorPrinter::PrintError("Unknown type of texture");
+        }
+
+        // glUniform1i()
+    }
 }
 
 void OpMesh::SetupMesh()
