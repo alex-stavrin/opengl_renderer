@@ -60,6 +60,16 @@ uniform DirectionalLight directional_light;
 uniform PointLight point_lights[4];
 uniform SpotLight spot_light;
 
+// Diffuse textures
+uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_diffuse2;
+uniform sampler2D texture_diffuse3;
+
+// Specular textures
+uniform sampler2D texture_specular1;
+uniform sampler2D texture_specular2;
+uniform sampler2D texture_specular3;
+
 vec3 CalculateDirectionalLight(vec3 texture_color, vec3 texture_specular, DirectionalLight directional_light, vec3 normal,
     vec3 view_direction)
 {
